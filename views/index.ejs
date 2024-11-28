@@ -255,23 +255,29 @@
         let inputTitel = d3.select("#inputTitel");
         let suggestions = d3.select("#suggestions").node();
 
-        function keyDown(e) {
-            if (e.key === "Enter") {
+        function keyDown(e)
+        {
+            if (e.key === "Enter")
+            {
                 selectedSearchRes.classList.remove("selected");
 
                 loadWikiPage(selectedSearchRes.innerHTML);
                 //searchButtonClick();
             }
 
-            if (selectedSearchRes == null) {
-                switch (e.key) {
+            if (selectedSearchRes == null)
+            {
+                switch (e.key)
+                {
                     case "ArrowUp": selectedSearchRes = suggestions.lastChild; break;
                     case "ArrowDown": selectedSearchRes = suggestions.firstChild; break;
                 }
             }
-            else {
+            else
+            {
                 selectedSearchRes.classList.remove("selected");
-                switch (e.key) {
+                switch (e.key)
+                {
                     case "ArrowUp": selectedSearchRes = selectedSearchRes.previousSibling; break;
                     case "ArrowDown": selectedSearchRes = selectedSearchRes.nextSibling; break;
                 }
@@ -279,11 +285,13 @@
             if (selectedSearchRes != null) selectedSearchRes.classList.add("selected");
         }
 
-        inputTitel.on("focus", () => {
+        inputTitel.on("focus", () =>
+        {
             inputTitel.on("keydown", keyDown);
         });
 
-        inputTitel.on("blur", () => {
+        inputTitel.on("blur", () =>
+        {
             inputTitel.on("keydown", null);
         });
 
@@ -295,23 +303,28 @@
 
         let searchButton = d3.select("#searchViewButton");
 
-        function changePage(oldPage, newPage) {
-            if (oldPage != null) {
+        function changePage(oldPage, newPage)
+        {
+            if (oldPage != null)
+            {
                 oldPage.style("display", "none");
             }
-            if (newPage != null) {
+            if (newPage != null)
+            {
                 newPage.style("display", "unset");
             }
         }
 
         let isSearch = null;
 
-        function searchButtonClick(val) {
+        function searchButtonClick(val)
+        {
             if (typeof val === 'undefined') isSearch = !isSearch;
             else isSearch = val;
 
 
-            if (isSearch) {
+            if (isSearch)
+            {
                 changePage(currentPage, searchDiv);
 
                 searchButton.classed("view", true);
@@ -321,7 +334,8 @@
 
                 d3.selectAll("#navbar > .page").style("display", "none");
             }
-            else {
+            else
+            {
                 changePage(searchDiv, currentPage);
 
                 searchButton.classed("search", true);
