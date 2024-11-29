@@ -1,28 +1,55 @@
-const express = require('express');
-const path = require('path');
-
+const express = require("express");
+const path = require("path");
+const axios = require("axios");
 const app = express();
 
 // Set up middleware and configurations
 
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public')));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
 
-
-app.get('/', (req, res) =>
+app.get("/", async (req, res) =>
 {
-    res.render('dashboard');
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+
+    try
+    {
+        const apiUrl = `https://en.wikipedia.org/api/rest_v1/feed/featured/${yyyy}/${mm}/${dd}`;
+        const response = await axios.get(apiUrl);
+        //the most read articles are featured in the wikipedia
+        const mostRead = response.data.mostread.articles.slice(0, 10);
+        console.log(mostRead);
+
+        // use map to extract necessary information
+        var articles = mostRead.map((article) => ({
+            title: article.titles.normalized,
+            description: article.extract,
+            image: article.thumbnail ? article.thumbnail.source : null,
+            pageId: article.pageid,
+        }));
+    } catch (error)
+    {
+        console.log(error);
+        res.status(400).send(`${error}`);
+
+    }
+    res.render("dashboard", { articles });
+
+
 });
 
-app.get('/brainstorm', (req, res) =>
+app.get("/brainstorm", (req, res) =>
 {
-    res.render('brainstorm');
+    res.render("brainstorm");
 });
 
-app.get('/about', (req, res) =>
+app.get("/about", (req, res) =>
 {
-    res.render('about');
+    res.render("about");
 });
 
 // Step 5: Start the server
@@ -31,5 +58,3 @@ app.listen(PORT, () =>
 {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-
