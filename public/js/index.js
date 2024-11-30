@@ -1,32 +1,3 @@
-/*
-    Third-party licenses
-
-    See also https://arifr1234.github.io/wikipedia-graph/about.html for further information.
-
-    This file contains modified javascript code from an Observable Notebook (https://observablehq.com/@d3/force-directed-graph).
-    * Copyright 2017-2020 Observable, Inc.; Licensed under ISC license (text below).
-
-    ISC License:
-
-    Permission to use, copy, modify, and/or distribute this software for any
-    purpose with or without fee is hereby granted, provided that the above
-    copyright notice and this permission notice appear in all copies.
-
-    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-*/
-
-
-
-
-
-
 drag = simulation =>
 {
 
@@ -77,24 +48,6 @@ svg.call(d3.zoom()
         container.attr("transform", transform);
     }))
     ;
-
-
-
-
-/// Marker ///
-/*svg.append("svg:defs").append("svg:marker")
-    .attr("id", "triangle")
-    .attr("refX", -2)
-    .attr("refY", 0)
-    .attr("markerWidth", 3.5)
-    .attr("markerHeight", 3.5)
-    .attr("orient", "auto")
-    .attr("viewBox", "-6, -6, 12, 12")
-    .append("path")
-    .attr("d", "M -6 -6 6 0 -6 6 -3 0")
-    .style("fill", "#999")
-    .attr("opacity", 0.6)
-;*/
 
 
 let container = svg.append("g");
@@ -236,6 +189,8 @@ function nodeColor(highlightTitel)
     });
 }
 
+
+
 function updateLink()
 {
     d3.select("#shareA").attr("href", `${location.origin}${location.pathname}?pageids=${Object.values(dataNodes).map(d => d.pageid).join('|')}`);
@@ -298,10 +253,7 @@ function loadWikiPage(titel, scrollTo, eraseforwardStack = true)
                     let last = d3.select(this).attr("href");
 
                     let mat = last.match(/^(?:(?:(?:https?:)?\/\/en\.wikipedia\.org\/wiki)|\.)\/([^#/]+)(?:#(.+))?/);
-                    //  /^(?:(?:(?:https?:)?\/\/en\.wikipedia\.org\/wiki)|\.)\/([^#/]+)(?:#(.+))?/
-                    //  /^(?:(?:https?:\/\/en\.wikipedia\.org\/wiki)|\.)\/([^#/]+)(?:#(.+))?/
-                    //  /^\.\/([^#]+)(#(.+))?/
-                    //  /^\.\/([^#]+)/
+
 
                     const linkTitel = (mat != null ? mat[1].replace(/_/g, ' ') : "");
 
@@ -415,12 +367,8 @@ function loadWikiPage(titel, scrollTo, eraseforwardStack = true)
         {
             currentPage.node().scrollTop = 0;
         }
-
-        searchButtonClick(false);
     });
 }
-
-//loadWikiPage("Glider (Conway's Life)");
 
 
 let params = new URLSearchParams(location.search);
@@ -506,35 +454,6 @@ var dd = String(today.getUTCDate()).padStart(2, '0');
 var mm = String(today.getMonth() + 1).padStart(2, '0');
 var yyyy = today.getFullYear();
 
-// Won't work on month ends.
-
-
-let pagesFeed = null;
-d3.json(`https://en.wikipedia.org/api/rest_v1/feed/featured/${yyyy}/${mm}/${dd}`)
-    .then((data) => 
-    {
-
-        let mostread = "mostread" in data ? data.mostread.articles.map(d => d.normalizedtitle) : [];
-        let news = "news" in data ? data.news.map(d => d.links[0].normalizedtitle) : [];
-        let onthisday = "onthisday" in data ? data.onthisday.map(d => d.pages[0].normalizedtitle) : [];
-
-        pagesFeed = [data.tfa.normalizedtitle];
-
-        let mostreadNum = Math.min(4, mostread.length);
-        Array.prototype.push.apply(pagesFeed, mostread.slice(0, mostreadNum));
-
-        let newsNum = Math.min(2, news.length);
-        Array.prototype.push.apply(pagesFeed, news.slice(0, newsNum));
-
-        let onthisdayNum = Math.min(3, onthisday.length);
-        Array.prototype.push.apply(pagesFeed, onthisday.slice(0, onthisdayNum));
-
-        Array.prototype.push.apply(pagesFeed, mostread.slice(mostreadNum, mostreadNum + 10 - pagesFeed.length));
-    })
-    .then(() => titelOnInput({ "target": { "value": "" } }))
-    ;
-
-
 d3.select("#randmArticle").on("click", () =>
 {
     d3.json(`https://en.wikipedia.org/api/rest_v1/page/random/title`)//(`https://www.mediawiki.org/w/api.php?action=query&list=random&rnnamespace=0`)
@@ -545,13 +464,6 @@ d3.select("#randmArticle").on("click", () =>
         })
         ;
 });
-
-
-
-
-
-
-
 
 let backStack = [];
 let forwardStack = [];
