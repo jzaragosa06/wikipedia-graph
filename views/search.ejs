@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html id="html">
+
+<head>
+    <!-- Jquery CDN -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <title>Wikipedia Graph</title>
+
+    <link rel="stylesheet"
+        href="//en.wikipedia.org/w/load.php?debug=false&lang=en&modules=mediawiki.legacy.commonPrint,shared|skins.vector.styles&only=styles&skin=vector&*">
+    <style>
+        .suggestion {
+            display: block;
+            margin: 5px;
+            border-style: solid;
+            border-width: 1.5px;
+            border-color: transparent;
+            cursor: pointer;
+        }
+
+        .selected {
+            border-color: #a2a9b1;
+        }
+
+        #randmArticle {
+            display: inline-block;
+            margin: 5px;
+            margin-left: 15px;
+        }
+
+        .highlight-yellow {
+            background-color: yellow;
+        }
+
+        .noselect {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body id="body">
+    <div id="pageContainer" class="flex justify-center items-center h-screen bg-gray-100">
+        <div id="searchDiv" class="flex space-x-4 bg-white p-4 rounded-lg shadow-md">
+            <!-- Search Input -->
+            <div class="flex-grow">
+                <input id="inputTitel" placeholder="Type Something, e.g., Millennial Market" autocomplete="off"
+                    type="text"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                <div id="suggestions" class="mt-2"></div>
+            </div>
+
+            <!-- Random Article Button -->
+            <a id="randmArticle"
+                class="px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow hover:bg-blue-600 transition duration-200 text-center cursor-pointer">
+                Random Article
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const inputTitel = document.querySelector("#inputTitel");
+        const suggestionsContainer = document.querySelector("#suggestions");
+        const randomArticleButton = document.querySelector("#randmArticle");
+
+        let currentPage = null;
+
+        function changePage(oldPage, newPage)
+        {
+            if (oldPage != null)
+            {
+                oldPage.style.display = "none";
+            }
+            if (newPage != null)
+            {
+                newPage.style.display = "unset";
+            }
+        }
+
+        function titelOnInput(e)
+        {
+            const searchString = e.target.value;
+            let pr;
+
+            if (searchString === "")
+            {
+                pr = Promise.resolve().then(() => []);
+            } else
+            {
+                // Fetch suggestions using OpenSearch
+                pr = fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&origin=*&limit=10&search=${searchString}`)
+                    .then(response => response.json())
+                    .then(data => data[1]); // Extract the list of suggested titles (second item in response)
+            }
+
+            pr.then(data =>
+            {
+                suggestionsContainer.innerHTML = ""; // Clear existing suggestions
+                data.forEach(searchRes =>
+                {
+                    const suggestionElement = document.createElement("a");
+                    suggestionElement.className = "suggestion";
+                    suggestionElement.textContent = searchRes;
+                    suggestionElement.addEventListener("click", () =>
+                    {
+                        console.log(`Selected: ${searchRes}`);
+                        fetchPageId(searchRes);
+                    });
+                    suggestionsContainer.appendChild(suggestionElement);
+                });
+            });
+        }
+
+        // Function to fetch the pageid for a given title
+        function fetchPageId(title)
+        {
+            const url = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&format=json&origin=*`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data =>
+                {
+                    const pages = data.query.pages;
+                    const pageId = Object.keys(pages)[0]; // Get the first (and usually only) pageid
+                    console.log(`Page ID for "${title}": ${pageId}`);
+                    loadWikiPage(pageId); // Replace loadWikiPage(searchRes) to use pageId
+                })
+                .catch(error => console.error("Error fetching pageid:", error));
+        }
+
+        inputTitel.addEventListener("input", titelOnInput);
+
+        randomArticleButton.addEventListener("click", () =>
+        {
+            fetch(`https://en.wikipedia.org/api/rest_v1/page/random/title`)
+                .then(response => response.json())
+                .then(data =>
+                {
+                    loadWikiPage(data.items[0].title);
+                })
+                .catch(error => console.error("Error fetching random article:", error));
+        });
+
+        function loadWikiPage(title)
+        {
+            console.log(`Loading Wikipedia page: ${title}`);
+            // Implement functionality to load the Wikipedia page.
+        }
+
+    </script>
+</body>
+
+</html>

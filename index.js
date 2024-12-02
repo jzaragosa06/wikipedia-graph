@@ -30,13 +30,15 @@ app.get("/", async (req, res) =>
             image: article.thumbnail ? article.thumbnail.source : null,
             pageId: article.pageid,
         }));
+
+        res.render("dashboard", { articles });
+
     } catch (error)
     {
         console.log(error);
         res.status(400).send(`${error}`);
 
     }
-    res.render("dashboard", { articles });
 
 
 });
@@ -45,6 +47,12 @@ app.get("/brainstorm", (req, res) =>
 {
     res.render("brainstorm");
 });
+
+app.get("/search", (req, res) =>
+{
+    res.render("search");
+});
+
 
 app.get("/about", (req, res) =>
 {
